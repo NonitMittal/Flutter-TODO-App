@@ -41,14 +41,6 @@ class _SignUpPageState extends State<SignUpPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Padding(
-              padding: EdgeInsets.only(bottom: 30.0),
-              child: Icon(
-                Icons.account_circle_sharp,
-                size: 200,
-                color: Colors.blueAccent,
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.only(top: 1),
               child: Form(
@@ -164,23 +156,23 @@ class _SignUpPageState extends State<SignUpPage> {
 
                             if (password != confirmPassword) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Password Not Match . . .'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                            } else if (password == confirmPassword){
+                                const SnackBar(
+                                  content: Text('Password Not Match . . .'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            } else if (password == confirmPassword) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('Signing You Up . . .'),
-                                    backgroundColor: Colors.green,
-                                  ),
-                                );
-                                
+                                const SnackBar(
+                                  content: Text('Signing You Up . . .'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+
                               createUserWithEmailAndPassword(
                                 emailAddress: emailAddress,
                                 password: password,
-                              ).then((value) { 
+                              ).then((value) {
                                 Navigator.pushNamedAndRemoveUntil(
                                     context, MyHomePage.id, (_) => false);
                               });

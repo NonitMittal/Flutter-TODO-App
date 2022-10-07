@@ -4,17 +4,6 @@ import 'package:todo_app/utilities/todo_item.dart';
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-CollectionReference<ToDoItem> getEventRef(String currentUserUid) {
-  return firestore
-      .collection('TODO_DATA')
-      .doc(currentUserUid)
-      .collection("items")
-      .withConverter(
-        fromFirestore: (snapshot, _) => ToDoItem.fromJson(snapshot.data()!),
-        toFirestore: (ToDoItem todoItem, _) => todoItem.toJson(),
-      );
-}
-
 Future<void> addItem({
   required String title,
   required String information,
@@ -22,17 +11,14 @@ Future<void> addItem({
   String currentUserUid = getLoggedInUserId();
   if (currentUserUid.isNotEmpty) {
     String ts = DateTime.now().millisecondsSinceEpoch.toString();
+    final db = firestore.collection(currentUserUid).doc(ts);
 
-    final eventsRef = getEventRef(currentUserUid);
-
-    await eventsRef.doc(ts).set(
-          ToDoItem(
-            id: ts,
-            title: title,
-            information: information,
-            complete: false,
-          ),
-        );
+    await db.set({
+      "id": ts,
+      "title": title,
+      "information": information,
+      "complete": false
+    });
   }
 }
 
@@ -42,15 +28,13 @@ Future<void> updateItem({
 }) async {
   String currentUserUid = getLoggedInUserId();
   if (currentUserUid.isNotEmpty) {
-    final eventsRef = getEventRef(currentUserUid);
+    final db = firestore.collection(currentUserUid).doc(id);
 
-    await eventsRef.doc(id).update(
-      {
-        'title': newData.title,
-        'information': newData.information,
-        'complete': newData.complete,
-      },
-    );
+    await db.update({
+      "title": newData.title,
+      "information": newData.information,
+      "complete": newData.complete
+    });
   }
 }
 
@@ -59,17 +43,20 @@ Future<void> deleteItem({
 }) async {
   String currentUserUid = getLoggedInUserId();
   if (currentUserUid.isNotEmpty) {
-    final eventsRef = getEventRef(currentUserUid);
-    await eventsRef.doc(id).delete();
+    final db = firestore.collection(currentUserUid).doc(id);
+    await db.delete();
   }
 }
 
 Future<List<QueryDocumentSnapshot<ToDoItem>>?> getItems() async {
   String currentUserUid = getLoggedInUserId();
   if (currentUserUid.isNotEmpty) {
-    final eventsRef = getEventRef(currentUserUid);
+    final ref = firestore.collection(currentUserUid).withConverter(
+          fromFirestore: (snapshot, _) => ToDoItem.fromJson(snapshot.data()!),
+          toFirestore: (ToDoItem todoItem, _) => todoItem.toJson(),
+        );
 
-    return await eventsRef.get().then((snapshot) => snapshot.docs);
+    return await ref.get().then((snapshot) => snapshot.docs);
   }
   return null;
 }
